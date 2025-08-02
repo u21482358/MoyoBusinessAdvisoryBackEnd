@@ -6,7 +6,24 @@ using MoyoBusinessAdvisory.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//builder.Services.AddCors(options => options.AddDefaultPolicy(
+//    include =>
+//    {
+//        include.AllowAnyHeader();
+//        include.AllowAnyMethod();
+//        include.AllowAnyOrigin();
+//    }));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllHeaders",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
 
 // https://stackoverflow.com/questions/56686093/unable-to-create-an-object-of-type-dbcontext#:~:text=Seems%20like%20you%20implemented%20IdentityContext%20but%20somewhere%20in%20your%20app%20its%20still%20trying%20to%20reference%20DbContext.%20Make%20sure%20Identitycontext%20is%20extending%20DbContext.
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
@@ -25,13 +42,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options => options.AddDefaultPolicy(
-    include =>
-    {
-        include.AllowAnyHeader();
-        include.AllowAnyMethod();
-        include.AllowAnyOrigin();
-    }));
+
 
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -41,7 +52,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 // make sure builder stuff is before builder.Build()
 
 var app = builder.Build();
-
+app.UseCors("AllowAllHeaders");
 
 
 // Configure the HTTP request pipeline.

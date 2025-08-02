@@ -24,7 +24,15 @@ namespace MoyoBusinessAdvisory.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Product>> PostProduct(Product prod)
         {
-            _context.Products.Add(prod);
+            // cannot insert duplicate key in object asp net microsoft entity framework core.
+             _context.Users.Attach(prod.Vendor); // attaches to make sure that stage is unchanged...
+            //prod.
+            //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
+           // prod.Vendor = prod.Vendor;
+            
+            var product = _context.Products.Add(prod);
+            
+                
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = prod.Id }, prod);
@@ -34,8 +42,8 @@ namespace MoyoBusinessAdvisory.Controllers
         [Route("get")]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-            return await _context.Products.ToListAsync();
+        { var prods = await _context.Products.Include(c => c.Vendor).ToListAsync(); // gets the reference to the object.
+            return prods;
         }
     }
 }

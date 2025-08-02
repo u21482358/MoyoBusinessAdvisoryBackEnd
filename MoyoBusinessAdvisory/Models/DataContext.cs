@@ -22,15 +22,15 @@ namespace MoyoBusinessAdvisory.Models
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         { }
-        public DbSet<Client> Clients { get; set; }
+        //public DbSet<Client> Clients { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<Orderline> Orderlines { get; set; }
 
         public DbSet<UserRole> UserRoles { get; set; }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Vendor> Vendors { get; set; }
+        //public DbSet<Vendor> Vendors { get; set; }
     }
 }

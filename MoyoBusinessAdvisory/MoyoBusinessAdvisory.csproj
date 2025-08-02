@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Folder Include="Models\DBContext\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
 
 </Project>

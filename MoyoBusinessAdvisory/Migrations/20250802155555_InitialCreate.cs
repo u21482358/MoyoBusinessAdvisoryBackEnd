@@ -78,7 +78,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserRoleId = table.Column<int>(type: "int", nullable: false),
+                    UserRoleID = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
@@ -100,15 +100,14 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_UserRoles_UserRoleId",
-                        column: x => x.UserRoleId,
+                        name: "FK_AspNetUsers_UserRoles_UserRoleID",
+                        column: x => x.UserRoleID,
                         principalTable: "UserRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -120,9 +119,9 @@ namespace MoyoBusinessAdvisory.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_UserRoles_UserRoleId",
+                        name: "FK_User_UserRoles_UserRoleId",
                         column: x => x.UserRoleId,
                         principalTable: "UserRoles",
                         principalColumn: "Id",
@@ -220,9 +219,9 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PlacedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    OrderStatusId = table.Column<int>(type: "int", nullable: true)
+                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlacedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -231,12 +230,14 @@ namespace MoyoBusinessAdvisory.Migrations
                         name: "FK_Orders_AspNetUsers_ClientId",
                         column: x => x.ClientId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orders_OrderStatuses_OrderStatusId",
                         column: x => x.OrderStatusId,
                         principalTable: "OrderStatuses",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -246,9 +247,9 @@ namespace MoyoBusinessAdvisory.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     price = table.Column<double>(type: "float", nullable: false),
-                    stockonHand = table.Column<int>(type: "int", nullable: false),
-                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    stockonHand = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -257,7 +258,8 @@ namespace MoyoBusinessAdvisory.Migrations
                         name: "FK_Products_AspNetUsers_VendorId",
                         column: x => x.VendorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -267,8 +269,8 @@ namespace MoyoBusinessAdvisory.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: true)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -277,13 +279,14 @@ namespace MoyoBusinessAdvisory.Migrations
                         name: "FK_Orderlines_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Orderlines_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -319,9 +322,9 @@ namespace MoyoBusinessAdvisory.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_UserRoleId",
+                name: "IX_AspNetUsers_UserRoleID",
                 table: "AspNetUsers",
-                column: "UserRoleId");
+                column: "UserRoleID");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -356,8 +359,8 @@ namespace MoyoBusinessAdvisory.Migrations
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_UserRoleId",
-                table: "Users",
+                name: "IX_User_UserRoleId",
+                table: "User",
                 column: "UserRoleId");
         }
 
@@ -383,7 +386,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "Orderlines");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

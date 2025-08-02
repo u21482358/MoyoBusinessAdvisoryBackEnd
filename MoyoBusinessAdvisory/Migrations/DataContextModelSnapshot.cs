@@ -221,7 +221,7 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("UserRoleId")
+                    b.Property<int?>("UserRoleID")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -234,7 +234,7 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("UserRoleId");
+                    b.HasIndex("UserRoleID");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -252,9 +252,10 @@ namespace MoyoBusinessAdvisory.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClientId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("OrderStatusId")
+                    b.Property<int>("OrderStatusId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PlacedOn")
@@ -294,7 +295,7 @@ namespace MoyoBusinessAdvisory.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("OrderId")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -325,6 +326,7 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VendorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("price")
@@ -367,7 +369,7 @@ namespace MoyoBusinessAdvisory.Migrations
 
                     b.HasIndex("UserRoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
@@ -456,29 +458,37 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     b.HasOne("MoyoBusinessAdvisory.Models.UserRole", "UserRole")
                         .WithMany()
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserRoleID");
 
                     b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Order", b =>
                 {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Client", null)
+                    b.HasOne("MoyoBusinessAdvisory.Models.Client", "Client")
                         .WithMany("Orders")
-                        .HasForeignKey("ClientId");
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("MoyoBusinessAdvisory.Models.OrderStatus", null)
+                    b.HasOne("MoyoBusinessAdvisory.Models.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
-                        .HasForeignKey("OrderStatusId");
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("OrderStatus");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Orderline", b =>
                 {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Order", null)
+                    b.HasOne("MoyoBusinessAdvisory.Models.Order", "Order")
                         .WithMany("Orderlines")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MoyoBusinessAdvisory.Models.Product", "Product")
                         .WithMany()
@@ -486,20 +496,26 @@ namespace MoyoBusinessAdvisory.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Order");
+
                     b.Navigation("Product");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
                 {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", null)
+                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", "Vendor")
                         .WithMany("Products")
-                        .HasForeignKey("VendorId");
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.User", b =>
                 {
                     b.HasOne("MoyoBusinessAdvisory.Models.UserRole", "UserRole")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -515,6 +531,11 @@ namespace MoyoBusinessAdvisory.Migrations
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.OrderStatus", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>

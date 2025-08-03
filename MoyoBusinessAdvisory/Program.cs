@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MoyoBusinessAdvisory;
 using MoyoBusinessAdvisory.Models;
+using Newtonsoft.Json.Serialization;
+//using Microsoft.AspNetCore.Mvc.New
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,24 +33,37 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireDigit = true;
-    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = false;
+    options.User.RequireUniqueEmail = false;
     //options.User.re
 })
 .AddEntityFrameworkStores<DataContext>()
 .AddDefaultTokenProviders();
-builder.Services.AddControllers();
+//https://stackoverflow.com/questions/59199593/net-core-3-0-possible-object-cycle-was-detected-which-is-not-supported
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+// added in https://stackoverflow.com/questions/67974556/system-text-json-jsonexception-a-possible-object-cycle-was-detected
+builder.Services.AddMvc()
+                .AddJsonOptions(opt =>
+                {
+                    opt.JsonSerializerOptions.ReferenceHandler = null;
+                });
 
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 // make sure builder stuff is before builder.Build()
 
 var app = builder.Build();

@@ -217,12 +217,8 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int?>("UserRoleID")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -233,8 +229,6 @@ namespace MoyoBusinessAdvisory.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("UserRoleID");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -452,15 +446,6 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.AppUser", b =>
-                {
-                    b.HasOne("MoyoBusinessAdvisory.Models.UserRole", "UserRole")
-                        .WithMany()
-                        .HasForeignKey("UserRoleID");
-
-                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Order", b =>

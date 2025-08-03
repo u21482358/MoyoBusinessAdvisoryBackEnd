@@ -10,6 +10,7 @@
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <PackageReference Include="IdentityUserRoleManagement" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
@@ -30,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="Models\DBContext\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 
 </Project>

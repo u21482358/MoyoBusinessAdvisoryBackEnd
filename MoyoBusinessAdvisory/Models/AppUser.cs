@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 namespace MoyoBusinessAdvisory.Models
 {
     //https://medium.com/@leroyleowdev/understanding-one-to-many-relationships-in-ef-core-with-examples-adb8db6eaa7c
     public class AppUser : IdentityUser
     {
-       // public int? Id { get; set; }
+        // public int? Id { get; set; }
+        //[Required] //https://stackoverflow.com/questions/10710393/nullable-property-to-entity-field-entity-framework-through-code-first/53831297
         public string Name { get; set; }
 
 

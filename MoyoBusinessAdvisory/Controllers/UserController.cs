@@ -1,16 +1,26 @@
 ﻿//using Microsoft.AspNet.Identity;
 //using Microsoft.AspNet.Identity.EntityFramework;
 //using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-
 //using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MoyoBusinessAdvisory.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
+using System.Security.Claims;
+using System.Text;
+using MoyoBusinessAdvisory.ViewModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace MoyoBusinessAdvisory.Controllers
 {
     [Route("api/[controller]")]
@@ -20,11 +30,16 @@ namespace MoyoBusinessAdvisory.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly DataContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserController(DataContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly IConfiguration _configuration;
+        private readonly IUserClaimsPrincipalFactory<AppUser> _claimsPrincipalFactory;
+        public UserController(DataContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IUserClaimsPrincipalFactory<AppUser> claimsPrincipalFactory)
         {
+
             _userManager = userManager;
             _context = context;
             _roleManager = roleManager;
+            _configuration = configuration;
+            _claimsPrincipalFactory = claimsPrincipalFactory;
         }
         // GET: UserController
 
@@ -105,6 +120,26 @@ namespace MoyoBusinessAdvisory.Controllers
             return CreatedAtAction("CreateVendor", new { id = result }, result);
         }
 
+        [HttpGet]
+        [Route("CheckAuthentication")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> CheckAuthentication()
+        {
+       // https://stackoverflow.com/questions/46112258/how-do-i-get-current-user-in-net-core-web-api-from-jwt-token
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = "";
+            if(userId != null)
+            {
+                var currentUser = await _userManager.FindByIdAsync(userId);
+                var roles = await _userManager.GetRolesAsync(currentUser);
+                role = roles.FirstOrDefault();
+            }
+
+            // maybe return the user role to the front end. then make it a global variable.
+            // https://stackoverflow.com/questions/76518758/how-to-return-plain-string-as-json-in-asp-net-core-7
+            return Ok(new { role = role });
+        }
+
         [HttpPost]
         [Route("postVendor")]
         public async Task<ActionResult<Product>> CreateVendor(Vendor vendor)
@@ -121,7 +156,54 @@ namespace MoyoBusinessAdvisory.Controllers
         }
 
         [HttpPost]
+        [Route("Login")]
+        public async Task<ActionResult> Login(SignInViewModel user) // if vendor wasnt connected then would have to pass thats as well...
+        {
+            var appUser = await _userManager.FindByNameAsync(user.UserName);
+
+            if (user != null && await _userManager.CheckPasswordAsync(appUser, user.Password))
+            {
+                return GenerateJWTToken(appUser);
+            }
+            else
+            {
+                return NotFound("Does not exist");
+            }
+        }
+
+        [HttpGet]
+        private ActionResult GenerateJWTToken(AppUser user)
+        {
+            // Create JWT Token
+            //https://stackoverflow.com/questions/71646794/how-to-put-user-id-in-registered-claims
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+               new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName) // userName needs to be unq
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                _configuration["Tokens:Issuer"],
+                _configuration["Tokens:Audience"],
+                claims,
+                signingCredentials: credentials,
+                expires: DateTime.UtcNow.AddHours(3)
+            );
+
+            return Created("", new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                user = user.UserName
+            });
+        }
+
+        [HttpPost]
         [Route("postCapturer")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Product>> CreateCapturer(AppUser user)
         {
             var result = await user.AddUser(_userManager, _context, _roleManager, "capturer");

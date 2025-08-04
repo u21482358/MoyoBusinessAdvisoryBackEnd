@@ -141,6 +141,34 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok(new { role = role });
         }
 
+        [HttpGet]
+        [Route("getVendorProducts")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Product>> GetVendorProducts()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            AppUser currentUser = await _userManager.FindByIdAsync(userId);
+
+            // https://stackoverflow.com/questions/25076702/cast-object-type-in-a-linq-statement
+            Vendor vendor = _context.Users.Where(v => v.Id == userId).Select(v =>v).OfType<Vendor>().Include(v => v.Products).FirstOrDefault();
+            
+
+
+            if (vendor == null)
+            {
+                return NotFound("Vendor not found");
+            }
+            else
+            {
+
+                //_context.Products.Add(prod);
+                //vendor.Products.Add(prod);
+                await _context.SaveChangesAsync();
+                //vendor.
+            }
+            return Ok(vendor);
+        }
+
         [HttpPost]
         [Route("postVendor")]
         public async Task<ActionResult<Product>> CreateVendor(Vendor vendor)

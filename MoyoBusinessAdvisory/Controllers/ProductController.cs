@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MoyoBusinessAdvisory.Models;
 using Microsoft.EntityFrameworkCore;
+using MoyoBusinessAdvisory.Models;
+using System.Security.Claims;
+
 namespace MoyoBusinessAdvisory.Controllers
 {
 
@@ -24,6 +28,7 @@ namespace MoyoBusinessAdvisory.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Product>> PostProduct(Product prod)
         {
+            
         // cannot insert duplicate key in object asp net microsoft entity framework core.
        // https://stackoverflow.com/questions/29272581/why-ef-navigation-property-return-null
             _context.Users.Attach(prod.Vendor); // attaches to make sure that stage is unchanged...
@@ -64,34 +69,43 @@ namespace MoyoBusinessAdvisory.Controllers
         [HttpPost]
         [Route("post2")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Product>> PostProductViaVendorICollection(Product prod)
+        public async Task<ActionResult<Product>> PostProductViaVendorICollection([FromBody] Product prod)
         {
             // cannot insert duplicate key in object asp net microsoft entity framework core.
             // https://stackoverflow.com/questions/29272581/why-ef-navigation-property-return-null
-            _context.Users.Attach(prod.Vendor); // attaches to make sure that stage is unchanged...
-                                                //prod.
-                                                //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
-                                                // prod.Vendor = prod.Vendor;
+            // attaches to make sure that stage is unchanged...
+            //prod.
+            //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
+            // prod.Vendor = prod.Vendor;
+            var vendor = _context.Vendors.Where(p => p == prod.Vendor).FirstOrDefault();
+            //var products = _context.Vendors.prd
+            var prods = await _context.Vendors.Include(vendor => vendor.Products).ToListAsync();
+           
+            
 
-
-            var vendors = await _context.Users.Where(x => x is Vendor).ToArrayAsync();
-            var vendor = vendors.FirstOrDefault(x => x.Id == prod.Vendor.Id);
             if (vendor == null)
             {
                 return NotFound("Vendor not found");
             }
             else
             {
+
+                _context.Products.Add(prod);
+                vendor.Products.Add(prod);
+                await _context.SaveChangesAsync();
                 //vendor.
             }
             return CreatedAtAction("GetProduct", new { id = prod.Id }, prod);
         }
 
 
+        
 
-      
 
-[HttpGet]
+
+
+
+        [HttpGet]
         [Route("get")]
         // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()

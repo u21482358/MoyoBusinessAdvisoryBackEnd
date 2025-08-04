@@ -1,7 +1,9 @@
 ﻿//using Microsoft.AspNet.Identity;
 //using Microsoft.AspNet.Identity.EntityFramework;
 //using Microsoft.AspNet.Identity;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 //using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,17 +12,16 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 //using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoyoBusinessAdvisory.Models;
+using MoyoBusinessAdvisory.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
 using System.Security.Claims;
 using System.Text;
-using MoyoBusinessAdvisory.ViewModels;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace MoyoBusinessAdvisory.Controllers
 {
     [Route("api/[controller]")]
@@ -156,6 +157,54 @@ namespace MoyoBusinessAdvisory.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
+        [Route("Oauth")]
+
+        //https://rajasekar.dev/blog/how-to-implement-google-authentication-in-aspnet-using-angular-and-jwt-a-detailed-guide
+        public async Task<ActionResult> OAuth(GoogleSignInVM? googleSignIn) // if vendor wasnt connected then would have to pass thats as well...
+        {
+            //var payload;
+            GoogleJsonWebSignature.Payload payload = null;
+            try
+            {
+                
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { _configuration["Authentication:Google:ClientId"] }
+                };
+                payload = await GoogleJsonWebSignature.ValidateAsync(googleSignIn.IdToken, settings); // check if signed by google i.e. google is accessing this
+                                                                                                      //return payload;
+
+                if (payload != null)
+                {
+                    var user = await _userManager.FindByEmailAsync(payload.Email);
+                    if (user != null)
+                    {
+                        return GenerateJWTToken(user);
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+                else
+                {
+                                       return BadRequest("Invalid Google Sign-In");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+                //log an exception
+
+                var user = await _userManager.FindByEmailAsync(payload.Email);
+                return GenerateJWTToken(user);
+
+
+            }
+        }
+
+            [HttpPost]
         [Route("Login")]
         public async Task<ActionResult> Login(SignInViewModel user) // if vendor wasnt connected then would have to pass thats as well...
         {
@@ -180,7 +229,8 @@ namespace MoyoBusinessAdvisory.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-               new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName) // userName needs to be unq
+               new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName), // userName needs to be unq
+              // new Claim(JwtRegisteredClaimNames.Email, user.Email) // userName needs to be unq
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));

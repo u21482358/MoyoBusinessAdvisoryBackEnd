@@ -1,3 +1,5 @@
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using MoyoBusinessAdvisory;
 using MoyoBusinessAdvisory.Models;
 using Newtonsoft.Json.Serialization;
+using System.Security.Policy;
 using System.Text;
 //using Microsoft.AspNetCore.Mvc.New
 
@@ -73,18 +76,60 @@ builder.Services.AddAuthentication()
                         ValidAudience = builder.Configuration["Tokens:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
                     };
-                });
+                }).AddGoogle(options =>
+                {
+
+          
+                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]; ;
+                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]; ;
+                }); ;
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+
 // make sure builder stuff is before builder.Build()
 
 var app = builder.Build();
 app.UseCors("AllowAllHeaders");
+
+//app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+//{
+//    ClientId = "YOUR CLIENT ID",
+//    ClientSecret = "YOUR CLIENT SECRET",
+//    CallbackPath = new PathString("/signin-google")
+//});
 app.UseAuthentication();
+//app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+//{
+//    ClientId = "YOUR CLIENT ID",
+//    ClientSecret = "YOUR CLIENT SECRET",
+//    CallbackPath = new PathString("/signin-google")
+//});
+
+//app.MapPost("/login-google", [AllowAnonymous] async (HttpContext context, GoogleLogin g) =>
+//{
+//    var result = await ValidateGoogleToken(g.IdToken);
+//    if (result == null)
+//        return Results.Unauthorized();
+
+//    var token = GenerateToken(GetClaims(result.Email, "user"));
+//    var refreshToken = GenerateRefreshToken();
+//    //TODO - store refreshToken in database for the user
+
+//    return Results.Ok(new User(result.Name, result.Picture, token, refreshToken));
+//});
+//app.MapControllerRoute(
+//    name: "signin-google",
+//    //url: "signin-google",
+//    pattern: "{controller=User}/{action=OAuth}/{id?}"
+//);
+//routes.MapRoute(name: "signin-google", url: "signin-google", defaults: new { controller = "Account", action = "ExternalLoginCallback" });
 app.UseAuthorization();
+//app.UseRouting();
+//https://stackoverflow.com/questions/57164127/the-oauth-state-was-missing-or-invalid-an-error-was-encountered-while-handling
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

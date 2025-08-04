@@ -27,7 +27,7 @@ namespace MoyoBusinessAdvisory.Models
             {
                 try
                 {
-                    var owner = await _userManager.FindByNameAsync(UserName);
+                    var owner = await _userManager.FindByEmailAsync(Email);
                     var result = await _userManager.CreateAsync(this,Password);
                     if (result.Succeeded)
                     {

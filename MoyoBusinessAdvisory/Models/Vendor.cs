@@ -22,9 +22,11 @@ namespace MoyoBusinessAdvisory.Models
 
         public override List<Product> GetProducts(DataContext _context)
         {
-
-            var val = _context.VendorProducts.Include(c => c.Product).Where(c => c.Vendor.Id == Id).Select(c => c.Product).ToList();
-            return val;
+            // https://stackoverflow.com/questions/2537823/distinct-by-property-of-class-with-linq
+            var products = _context.VendorProducts.Where(c => c.Vendor.Id == Id).Select(c => c.Product).GroupBy(c => c.Id).Select(g => g.First()).ToList();
+            //var products = _context.Products.Where(c => c.Id == vendorproducts.pr)
+            // selecting from all vendor products var val = _context.VendorProducts.Include(c => c.Product).Where(c => c.Vendor.Id == Id).Select(c => c.Product).ToList();
+            return products;
             // https://stackoverflow.com/questions/32436699/how-do-you-use-firstordefault-with-include
             
                 //WhToList();

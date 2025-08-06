@@ -73,11 +73,13 @@ namespace MoyoBusinessAdvisory.Controllers
         public async Task<ActionResult> GetOrders()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-          // Client currentUser = _userManager.FindByIdAsync(userId);
+          AppUser currentUser = await _userManager.FindByIdAsync(userId);
+
+           var orders = currentUser.GetOrders(_context);
 
 
             // you can call an override method on a specific type.
-            return Ok();
+            return Ok(orders);
         }
 
         //    // GET: OrderController/Edit/5

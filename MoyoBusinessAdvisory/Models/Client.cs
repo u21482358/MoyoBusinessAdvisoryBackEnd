@@ -11,7 +11,7 @@
         public override List<ProductOrder> GetOrders(DataContext _context)
         {
 
-            return this.Orders.ToList();
+            return _context.Orders.Where(c => c.Client.Id == Id).ToList();
             Console.WriteLine("Drawing a generic shape.");
         }
     }

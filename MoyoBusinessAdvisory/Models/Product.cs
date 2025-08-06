@@ -9,7 +9,9 @@
 
         //public Vendor Vendor { get; set; } // Navigation property to the Vendor
 
-        public ICollection<Vendor>? Vendors { get; set; }
+        public ICollection<VendorProduct> VendorProducts { get; } = [];
+
+       // public ICollection<VendorProduct> VendorProduct { get; } = null;
 
         // Product Status
 

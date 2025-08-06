@@ -19,7 +19,7 @@ namespace MoyoBusinessAdvisory.Models
         //{
         //    optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=SchoolDb;Trusted_Connection=True;");
         //}
-
+        //https://medium.com/@nwonahr/configuring-many-to-many-relationship-in-entity-framework-core-698dd356abec
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         { }
         //public DbSet<Client> Clients { get; set; }
@@ -30,10 +30,12 @@ namespace MoyoBusinessAdvisory.Models
 
         public DbSet<UserRole> UserRoles { get; set; }
 
-        public DbSet<VendorProduct> VendorProducts { get; set; }
+       public DbSet<VendorProduct> VendorProducts { get; set; }
 
         public DbSet<Product> Products { get; set; }
         
         public DbSet<Vendor> Vendors { get; set; }
     }
+
+   // public override void OnModelCreating()
 }

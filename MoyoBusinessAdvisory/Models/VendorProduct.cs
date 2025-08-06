@@ -1,9 +1,20 @@
-﻿namespace MoyoBusinessAdvisory.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MoyoBusinessAdvisory.Models
 {
+   // [PrimaryKey(nameof(VendorId), nameof(ProductId))]
     public class VendorProduct
     {
-
+        // https://stackoverflow.com/questions/74379809/the-foreign-key-property-was-created-in-shadow-state-because-a-conflicting-pr
         public int Id { get; set; }
+
+       
+       // public int ProductId { get; set; }
+
+      
+       // public int VendorId { get; set; }
         public Product Product { get; set; }
 
         public Vendor Vendor { get; set; }

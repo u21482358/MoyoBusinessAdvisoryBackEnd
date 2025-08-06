@@ -43,71 +43,6 @@ namespace MoyoBusinessAdvisory.Controllers
             _claimsPrincipalFactory = claimsPrincipalFactory;
         }
         // GET: UserController
-
-
-        // GET: UserController/Create
-        //[HttpPost]
-        //[Route("postVendor")]
-        //public async Task<ActionResult<Product>> CreateVendor(Vendor vendor)
-        //{
-        //    // https://stackoverflow.com/questions/19689183/add-user-to-role-asp-net-identity
-        //    // https://stackoverflow.com/questions/22486489/entity-framework-6-transaction-rollback
-        //    using (var dbcxtransaction = _context.Database.BeginTransaction())
-        //    {
-        //        try
-        //        {
-        //            var owner = await _userManager.FindByNameAsync(vendor.UserName);
-        //            var result = await _userManager.CreateAsync(vendor, vendor.Password);
-        //            if (result.Succeeded)
-        //            {
-        //                var currentUser = await _userManager.FindByIdAsync(vendor.Id);
-
-        //                var roleresult = await _userManager.AddToRoleAsync(currentUser, "vendor");
-        //                if (roleresult.Succeeded)
-        //                {
-        //                    await _context.SaveChangesAsync();
-        //                    //await _context.SaveChanges();
-        //                    // User added to role successfully
-        //                }
-        //                else
-        //                {
-        //                    // Handle role assignment failure
-        //                    return BadRequest(roleresult.Errors);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                return BadRequest(result.Errors);
-        //            }
-        //            _context.SaveChanges();
-
-        //            dbcxtransaction.Commit();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            {
-        //                return BadRequest(ex.Message);
-
-        //                // dbcxtransaction.Rollback();
-        //            }
-        //        }
-        //    }
-
-        //AppUser.Children.Add(vendor);
-        // _context.Users.Add(vendor);
-
-
-        //        return CreatedAtAction("CreateVendor", new { id = vendor.Id }, vendor);
-        //   // return View();
-        //}
-    
-
-            //AppUser.Children.Add(vendor);
-            // _context.Users.Add(vendor);
-
-
-            
-           // return View();
         
 
         [HttpGet]
@@ -141,33 +76,33 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok(new { role = role });
         }
 
-        [HttpGet]
-        [Route("getVendorProducts")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Product>> GetVendorProducts()
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            AppUser currentUser = await _userManager.FindByIdAsync(userId);
+        //[HttpGet]
+        //[Route("getVendorProducts")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //public async Task<ActionResult<Product>> GetVendorProducts()
+        //{
+        //    string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    AppUser currentUser = await _userManager.FindByIdAsync(userId);
 
-            // https://stackoverflow.com/questions/25076702/cast-object-type-in-a-linq-statement
-            Vendor vendor = _context.Users.Where(v => v.Id == userId).Select(v =>v).OfType<Vendor>().Include(v => v.Products).FirstOrDefault();
+        //    // https://stackoverflow.com/questions/25076702/cast-object-type-in-a-linq-statement
+        //    Vendor vendor = _context.Users.Where(v => v.Id == userId).Select(v =>v).OfType<Vendor>().Include(v => v.Products).FirstOrDefault();
             
 
 
-            if (vendor == null)
-            {
-                return NotFound("Vendor not found");
-            }
-            else
-            {
+        //    if (vendor == null)
+        //    {
+        //        return NotFound("Vendor not found");
+        //    }
+        //    else
+        //    {
 
-                //_context.Products.Add(prod);
-                //vendor.Products.Add(prod);
-                await _context.SaveChangesAsync();
-                //vendor.
-            }
-            return Ok(vendor);
-        }
+        //        //_context.Products.Add(prod);
+        //        //vendor.Products.Add(prod);
+        //        await _context.SaveChangesAsync();
+        //        //vendor.
+        //    }
+        //    return Ok(vendor);
+        //}
 
         [HttpPost]
         [Route("postVendor")]

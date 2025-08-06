@@ -12,7 +12,7 @@ using MoyoBusinessAdvisory.Models;
 namespace MoyoBusinessAdvisory.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250806060626_initial")]
+    [Migration("20250806104012_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -366,21 +366,6 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.ToTable("VendorProducts");
                 });
 
-            modelBuilder.Entity("ProductVendor", b =>
-                {
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VendorsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ProductsId", "VendorsId");
-
-                    b.HasIndex("VendorsId");
-
-                    b.ToTable("ProductVendor");
-                });
-
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>
                 {
                     b.HasBaseType("MoyoBusinessAdvisory.Models.AppUser");
@@ -477,13 +462,13 @@ namespace MoyoBusinessAdvisory.Migrations
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
                     b.HasOne("MoyoBusinessAdvisory.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("VendorProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MoyoBusinessAdvisory.Models.Vendor", "Vendor")
-                        .WithMany()
+                        .WithMany("VendorProducts")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -493,19 +478,9 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("ProductVendor", b =>
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
                 {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", null)
-                        .WithMany()
-                        .HasForeignKey("VendorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("VendorProducts");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
@@ -521,6 +496,11 @@ namespace MoyoBusinessAdvisory.Migrations
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Vendor", b =>
+                {
+                    b.Navigation("VendorProducts");
                 });
 #pragma warning restore 612, 618
         }

@@ -65,5 +65,16 @@ namespace MoyoBusinessAdvisory.Models
             }
             return IdentityResult.Success;
         }
+
+        public virtual List<ProductOrder> GetOrders( DataContext _context)
+        {
+            return _context.Orders.ToList();
+        }
+
+        public virtual List<Product> GetProducts(DataContext _context)
+        {
+            return _context.Products.ToList();
+            //  Console.WriteLine("Drawing a generic shape.");
+        }
     }
 }

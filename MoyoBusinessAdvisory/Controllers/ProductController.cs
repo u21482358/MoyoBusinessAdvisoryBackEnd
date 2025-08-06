@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MoyoBusinessAdvisory.Models;
 using System.Security.Claims;
 using MoyoBusinessAdvisory.ViewModels;
+using Microsoft.AspNetCore.Identity;
 namespace MoyoBusinessAdvisory.Controllers
 {
 
@@ -19,9 +20,11 @@ namespace MoyoBusinessAdvisory.Controllers
 
         //    private readonly DataContextcs _context;
         private readonly DataContext _context;
-        public ProductController(DataContext context)
+        private readonly UserManager<AppUser> _userManager;
+        public ProductController(DataContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         [HttpPost]
         [Route("post")]
@@ -51,7 +54,7 @@ namespace MoyoBusinessAdvisory.Controllers
                 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = vendorprod.Id }, vendorprod);
+            return CreatedAtAction("GetProduct", new { id = vendorprod }, vendorprod);
         }
 
         [HttpPost]
@@ -82,7 +85,7 @@ namespace MoyoBusinessAdvisory.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = vendorprod.Id }, vendorprod);
+            return CreatedAtAction("GetProduct", new { id = vendorprod }, vendorprod);
         }
 
         [HttpPut]
@@ -119,7 +122,7 @@ namespace MoyoBusinessAdvisory.Controllers
             // prod.Vendor = prod.Vendor;
             //var vendor = _context.Vendors.Where(p => p == prod.Vendor).FirstOrDefault();
             //var products = _context.Vendors.prd
-            var prods = await _context.Vendors.Include(vendor => vendor.Products).ToListAsync();
+          //  var prods = await _context.Vendors.Include(vendor => vendor.Products).ToListAsync();
 
 
 
@@ -157,14 +160,16 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok(vendors);
         }
 
+
+        // This is for when you place an order
         [HttpPost]
-        [Route("GetVendorsForProduct")]
+        [Route("GetVendorsOfferingProduct")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult> GetVendorsForproduct([FromBody] Product prod)
+        public async Task<ActionResult> GetVendorsOfferingproduct([FromBody] Product prod)
         {
             // excluding product from select.
-            var vendorProducts = _context.VendorProducts.Where(c => c.Product == prod && c.QuantityOnHand > 0).Select(c => new VendorProduct {Id = c.Id, Vendor = c.Vendor,Price = c.Price,QuantityOnHand = c.QuantityOnHand}).OrderBy(c => c.Price).ToList();
-           
+            var vendorProducts = _context.VendorProducts.Where(c => c.Product == prod && c.QuantityOnHand > 0).Select(c => new VendorProduct { Vendor = c.Vendor, Price = c.Price, QuantityOnHand = c.QuantityOnHand }).OrderBy(c => c.Price).ToList();
+
             return Json(vendorProducts);
         }
 
@@ -186,15 +191,20 @@ namespace MoyoBusinessAdvisory.Controllers
 
         [HttpGet]
         [Route("get")]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts() {
+
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            AppUser currentUser = await _userManager.FindByIdAsync(userId);
+
+           var products = currentUser.GetProducts(_context);
             //https://stackoverflow.com/questions/67890726/ef-core-trying-to-insert-relational-data-that-already-exists
-            var prods = await _context.Products.ToListAsync();
+          
          var vendors = await _context.Vendors.ToListAsync(); // gets the reference to the object.
             // https://stackoverflow.com/questions/28745798/how-should-i-return-two-lists-of-objects-from-one-controller-action
             return Json(new
             {
-                products = prods,
+                products = products,
                 vendors = vendors
             });
         }

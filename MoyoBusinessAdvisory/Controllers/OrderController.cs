@@ -66,6 +66,20 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok();
         }
 
+        [HttpGet]
+        [Route("get")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<ActionResult> GetOrders()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+          // Client currentUser = _userManager.FindByIdAsync(userId);
+
+
+            // you can call an override method on a specific type.
+            return Ok();
+        }
+
         //    // GET: OrderController/Edit/5
         //    public ActionResult Edit(int id)
         //    {

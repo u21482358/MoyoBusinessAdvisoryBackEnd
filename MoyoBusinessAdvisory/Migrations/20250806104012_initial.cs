@@ -186,30 +186,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductVendor",
-                columns: table => new
-                {
-                    ProductsId = table.Column<int>(type: "int", nullable: false),
-                    VendorsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductVendor", x => new { x.ProductsId, x.VendorsId });
-                    table.ForeignKey(
-                        name: "FK_ProductVendor_AspNetUsers_VendorsId",
-                        column: x => x.VendorsId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductVendor_Products_ProductsId",
-                        column: x => x.ProductsId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "VendorProducts",
                 columns: table => new
                 {
@@ -337,11 +313,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 column: "VendorProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductVendor_VendorsId",
-                table: "ProductVendor",
-                column: "VendorsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_User_UserRoleId",
                 table: "User",
                 column: "UserRoleId");
@@ -377,9 +348,6 @@ namespace MoyoBusinessAdvisory.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
-
-            migrationBuilder.DropTable(
-                name: "ProductVendor");
 
             migrationBuilder.DropTable(
                 name: "User");

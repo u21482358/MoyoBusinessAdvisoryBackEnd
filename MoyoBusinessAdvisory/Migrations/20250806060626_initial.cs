@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MoyoBusinessAdvisory.Migrations
 {
     /// <inheritdoc />
-    public partial class initialcreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,7 +54,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderStatuses",
+                name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -63,7 +63,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderStatuses", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -186,50 +186,53 @@ namespace MoyoBusinessAdvisory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "ProductVendor",
+                columns: table => new
+                {
+                    ProductsId = table.Column<int>(type: "int", nullable: false),
+                    VendorsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductVendor", x => new { x.ProductsId, x.VendorsId });
+                    table.ForeignKey(
+                        name: "FK_ProductVendor_AspNetUsers_VendorsId",
+                        column: x => x.VendorsId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductVendor_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorProducts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
                     VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    price = table.Column<double>(type: "float", nullable: false),
-                    stockonHand = table.Column<int>(type: "int", nullable: false)
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    QuantityOnHand = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_VendorProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_AspNetUsers_VendorId",
+                        name: "FK_VendorProducts_AspNetUsers_VendorId",
                         column: x => x.VendorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PlacedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_AspNetUsers_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_OrderStatuses_OrderStatusId",
-                        column: x => x.OrderStatusId,
-                        principalTable: "OrderStatuses",
+                        name: "FK_VendorProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -257,30 +260,31 @@ namespace MoyoBusinessAdvisory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orderlines",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    VendorProductId = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NumberOfItems = table.Column<double>(type: "float", nullable: false),
+                    UnitPrice = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orderlines", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orderlines_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_Orders_AspNetUsers_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Orders_VendorProducts_VendorProductId",
+                        column: x => x.VendorProductId,
+                        principalTable: "VendorProducts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orderlines_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -323,34 +327,34 @@ namespace MoyoBusinessAdvisory.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orderlines_OrderId",
-                table: "Orderlines",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orderlines_ProductId",
-                table: "Orderlines",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_ClientId",
                 table: "Orders",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_OrderStatusId",
+                name: "IX_Orders_VendorProductId",
                 table: "Orders",
-                column: "OrderStatusId");
+                column: "VendorProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_VendorId",
-                table: "Products",
-                column: "VendorId");
+                name: "IX_ProductVendor_VendorsId",
+                table: "ProductVendor",
+                column: "VendorsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_UserRoleId",
                 table: "User",
                 column: "UserRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorProducts_ProductId",
+                table: "VendorProducts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorProducts_VendorId",
+                table: "VendorProducts",
+                column: "VendorId");
         }
 
         /// <inheritdoc />
@@ -372,7 +376,10 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Orderlines");
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "ProductVendor");
 
             migrationBuilder.DropTable(
                 name: "User");
@@ -381,19 +388,16 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Orders");
-
-            migrationBuilder.DropTable(
-                name: "Products");
+                name: "VendorProducts");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "OrderStatuses");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Products");
         }
     }
 }

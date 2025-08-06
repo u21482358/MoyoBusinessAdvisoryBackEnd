@@ -12,8 +12,8 @@ using MoyoBusinessAdvisory.Models;
 namespace MoyoBusinessAdvisory.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250803112410_initial-create")]
-    partial class initialcreate
+    [Migration("20250806060626_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,76 +240,6 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("OrderStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PlacedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("OrderStatusId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.OrderStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderStatuses");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Orderline", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Orderlines");
-                });
-
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -322,21 +252,41 @@ namespace MoyoBusinessAdvisory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VendorId")
-                        .IsRequired()
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.ProductOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClientId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<double>("price")
+                    b.Property<double>("NumberOfItems")
                         .HasColumnType("float");
 
-                    b.Property<int>("stockonHand")
+                    b.Property<DateTime?>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("UnitPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int>("VendorProductId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VendorId");
+                    b.HasIndex("ClientId");
 
-                    b.ToTable("Products");
+                    b.HasIndex("VendorProductId");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.User", b =>
@@ -384,6 +334,51 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityOnHand")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("VendorProducts");
+                });
+
+            modelBuilder.Entity("ProductVendor", b =>
+                {
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VendorsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ProductsId", "VendorsId");
+
+                    b.HasIndex("VendorsId");
+
+                    b.ToTable("ProductVendor");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>
@@ -451,53 +446,21 @@ namespace MoyoBusinessAdvisory.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Order", b =>
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.ProductOrder", b =>
                 {
                     b.HasOne("MoyoBusinessAdvisory.Models.Client", "Client")
                         .WithMany("Orders")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
-                    b.HasOne("MoyoBusinessAdvisory.Models.OrderStatus", "OrderStatus")
+                    b.HasOne("MoyoBusinessAdvisory.Models.VendorProduct", "VendorProduct")
                         .WithMany("Orders")
-                        .HasForeignKey("OrderStatusId")
+                        .HasForeignKey("VendorProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Client");
 
-                    b.Navigation("OrderStatus");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Orderline", b =>
-                {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Order", "Order")
-                        .WithMany("Orderlines")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MoyoBusinessAdvisory.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
-                {
-                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", "Vendor")
-                        .WithMany("Products")
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vendor");
+                    b.Navigation("VendorProduct");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.User", b =>
@@ -511,14 +474,38 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Order", b =>
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
-                    b.Navigation("Orderlines");
+                    b.HasOne("MoyoBusinessAdvisory.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.OrderStatus", b =>
+            modelBuilder.Entity("ProductVendor", b =>
                 {
-                    b.Navigation("Orders");
+                    b.HasOne("MoyoBusinessAdvisory.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MoyoBusinessAdvisory.Models.Vendor", null)
+                        .WithMany()
+                        .HasForeignKey("VendorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
@@ -526,14 +513,14 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Vendor", b =>
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.Client", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

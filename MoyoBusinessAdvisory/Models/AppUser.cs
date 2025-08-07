@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 namespace MoyoBusinessAdvisory.Models
 {
     //https://medium.com/@leroyleowdev/understanding-one-to-many-relationships-in-ef-core-with-examples-adb8db6eaa7c
@@ -68,12 +70,15 @@ namespace MoyoBusinessAdvisory.Models
 
         public virtual List<ProductOrder> GetOrders( DataContext _context)
         {
-            return _context.Orders.ToList();
+            return _context.Orders.Include(c => c.VendorProduct.Product).Include(c => c.VendorProduct.Vendor).Include(c => c.Client).ToList();
         }
 
-        public virtual List<Product> GetProducts(DataContext _context)
+        public virtual void GetProducts(DataContext _context,out object products)
         {
-            return _context.Products.ToList();
+
+            
+            products = _context.Products.ToList();
+            
             //  Console.WriteLine("Drawing a generic shape.");
         }
     }

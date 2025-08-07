@@ -74,7 +74,7 @@ namespace MoyoBusinessAdvisory.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
           AppUser currentUser = await _userManager.FindByIdAsync(userId);
-
+            object products;
            var orders = currentUser.GetOrders(_context);
 
 

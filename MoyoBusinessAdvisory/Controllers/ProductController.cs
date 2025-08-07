@@ -90,23 +90,27 @@ namespace MoyoBusinessAdvisory.Controllers
 
         [HttpPut]
         [Route("put")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Product>> PutProduct(Product prod)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Product>> PutProduct(VendorProductViewModel prod)
         {
             // cannot insert duplicate key in object asp net microsoft entity framework core.
             // https://stackoverflow.com/questions/29272581/why-ef-navigation-property-return-null
             //_context.Users.Attach(prod.Vendor); // attaches to make sure that stage is unchanged...
-                                                //prod.
-                                                //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
-                                                // prod.Vendor = prod.Vendor;
+            //prod.
+            //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
+            // prod.Vendor = prod.Vendor;
 
-
-            var product = _context.Products.Update(prod);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // AppUser currentUser = await _userManager.FindByIdAsync(userId);
+           var vendorProduct = _context.VendorProducts.Where(c => c.ProductId == prod.ProductId && c.VendorId == userId).FirstOrDefault();
+            vendorProduct.Price = prod.Price;
+            vendorProduct.QuantityOnHand = prod.QuantityOnHand;
+            var product = _context.VendorProducts.Update(vendorProduct);
 
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = prod.Id }, prod);
+            return CreatedAtAction("GetProduct", new { id = prod }, prod);
         }
 
         [HttpPost]
@@ -196,8 +200,8 @@ namespace MoyoBusinessAdvisory.Controllers
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             AppUser currentUser = await _userManager.FindByIdAsync(userId);
-
-           var products = currentUser.GetProducts(_context);
+            object products;
+           currentUser.GetProducts(_context,out products);
             //https://stackoverflow.com/questions/67890726/ef-core-trying-to-insert-relational-data-that-already-exists
           
          var vendors = await _context.Vendors.ToListAsync(); // gets the reference to the object.

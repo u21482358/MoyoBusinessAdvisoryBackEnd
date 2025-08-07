@@ -189,8 +189,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "VendorProducts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
@@ -198,7 +196,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VendorProducts", x => x.Id);
+                    table.PrimaryKey("PK_VendorProducts", x => new { x.VendorId, x.ProductId });
                     table.ForeignKey(
                         name: "FK_VendorProducts_AspNetUsers_VendorId",
                         column: x => x.VendorId,
@@ -241,7 +239,8 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    VendorProductId = table.Column<int>(type: "int", nullable: false),
+                    VendorProductVendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendorProductProductId = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NumberOfItems = table.Column<double>(type: "float", nullable: false),
@@ -256,10 +255,10 @@ namespace MoyoBusinessAdvisory.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Orders_VendorProducts_VendorProductId",
-                        column: x => x.VendorProductId,
+                        name: "FK_Orders_VendorProducts_VendorProductVendorId_VendorProductProductId",
+                        columns: x => new { x.VendorProductVendorId, x.VendorProductProductId },
                         principalTable: "VendorProducts",
-                        principalColumn: "Id",
+                        principalColumns: new[] { "VendorId", "ProductId" },
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -308,9 +307,9 @@ namespace MoyoBusinessAdvisory.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_VendorProductId",
+                name: "IX_Orders_VendorProductVendorId_VendorProductProductId",
                 table: "Orders",
-                column: "VendorProductId");
+                columns: new[] { "VendorProductVendorId", "VendorProductProductId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_UserRoleId",
@@ -321,11 +320,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "IX_VendorProducts_ProductId",
                 table: "VendorProducts",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VendorProducts_VendorId",
-                table: "VendorProducts",
-                column: "VendorId");
         }
 
         /// <inheritdoc />

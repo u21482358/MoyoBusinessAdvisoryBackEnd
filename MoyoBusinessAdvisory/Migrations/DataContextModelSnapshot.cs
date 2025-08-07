@@ -274,14 +274,18 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Property<double?>("UnitPrice")
                         .HasColumnType("float");
 
-                    b.Property<int>("VendorProductId")
+                    b.Property<int>("VendorProductProductId")
                         .HasColumnType("int");
+
+                    b.Property<string>("VendorProductVendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("VendorProductId");
+                    b.HasIndex("VendorProductVendorId", "VendorProductProductId");
 
                     b.ToTable("Orders");
                 });
@@ -335,30 +339,21 @@ namespace MoyoBusinessAdvisory.Migrations
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
+                    b.Property<string>("VendorId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
                     b.Property<int>("QuantityOnHand")
                         .HasColumnType("int");
 
-                    b.Property<string>("VendorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
+                    b.HasKey("VendorId", "ProductId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("VendorId");
 
                     b.ToTable("VendorProducts");
                 });
@@ -436,7 +431,7 @@ namespace MoyoBusinessAdvisory.Migrations
 
                     b.HasOne("MoyoBusinessAdvisory.Models.VendorProduct", "VendorProduct")
                         .WithMany("Orders")
-                        .HasForeignKey("VendorProductId")
+                        .HasForeignKey("VendorProductVendorId", "VendorProductProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

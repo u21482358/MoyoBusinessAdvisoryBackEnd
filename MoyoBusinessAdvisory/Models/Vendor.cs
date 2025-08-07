@@ -10,23 +10,25 @@ namespace MoyoBusinessAdvisory.Models
 
         //public int userRoleID { get; set; } = 1;
 
-        public ICollection<VendorProduct> VendorProducts { get; } = [];
+        public ICollection<VendorProduct>? VendorProducts { get; set; }
 
-      //  public ICollection<VendorProduct> VendorProduct { get; } = [];
+        
 
         public override List<ProductOrder> GetOrders(DataContext _context)
         {
-           return _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).ToList();
+           return _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.Client).ToList();
           //  Console.WriteLine("Drawing a generic shape.");
         }
 
-        public override List<Product> GetProducts(DataContext _context)
+        public override void GetProducts(DataContext _context,out object products)
         {
             // https://stackoverflow.com/questions/2537823/distinct-by-property-of-class-with-linq
-            var products = _context.VendorProducts.Where(c => c.Vendor.Id == Id).Select(c => c.Product).GroupBy(c => c.Id).Select(g => g.First()).ToList();
+            // maybe this will work?
+            // already grouped.
+            products = _context.VendorProducts.Where(c => c.Vendor.Id == Id).Include(p => p.Product).Select(c => new { name = c.Product.Name,productId= c.ProductId, Price = c.Price, QuantityOnHand = c.QuantityOnHand }).ToList();
             //var products = _context.Products.Where(c => c.Id == vendorproducts.pr)
             // selecting from all vendor products var val = _context.VendorProducts.Include(c => c.Product).Where(c => c.Vendor.Id == Id).Select(c => c.Product).ToList();
-            return products;
+            //return variable;
             // https://stackoverflow.com/questions/32436699/how-do-you-use-firstordefault-with-include
             
                 //WhToList();

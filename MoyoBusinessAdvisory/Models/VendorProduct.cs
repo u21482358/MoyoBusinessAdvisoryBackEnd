@@ -4,19 +4,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MoyoBusinessAdvisory.Models
 {
-   // [PrimaryKey(nameof(VendorId), nameof(ProductId))]
+     [PrimaryKey(nameof(VendorId), nameof(ProductId))]
+
+    
     public class VendorProduct
     {
         // https://stackoverflow.com/questions/74379809/the-foreign-key-property-was-created-in-shadow-state-because-a-conflicting-pr
-        public int Id { get; set; }
+
+     
+        //public int Id { get; set; }
 
        
-       // public int ProductId { get; set; }
+        public int? ProductId { get; set; }
 
       
-       // public int VendorId { get; set; }
+        public string? VendorId { get; set; } // this has to be a string
+
+        [ForeignKey("ProductId")]
         public Product Product { get; set; }
 
+        [ForeignKey("VendorId")]
         public Vendor Vendor { get; set; }
 
         // public Price Price { get; set; }

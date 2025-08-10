@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MoyoBusinessAdvisory.Models;
+using System.Data.Entity;
 using System.Security.Claims;
 
 namespace MoyoBusinessAdvisory.Controllers
@@ -56,8 +57,13 @@ namespace MoyoBusinessAdvisory.Controllers
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             Client currentUser = (Client)await _userManager.FindByIdAsync(userId);
-            // then assign that user to the order.
+            // then assign that user to the order.\
+            productOrder.VendorProduct.ProductId = productOrder.VendorProduct.Product.Id;
+            productOrder.VendorProduct.VendorId = productOrder.VendorProduct.Vendor.Id;
+            var productId = productOrder.VendorProduct.ProductId;
+            // var vendorProduct = _context.VendorProducts.Where(c => c.VendorId == productOrder.VendorProduct.Vendor.Id && c.ProductId == productOrder.VendorProduct.Product.Id).AsNoTracking().FirstOrDefault();
             _context.Attach(productOrder.VendorProduct);
+            //_context.VendorProducts.Attach(productOrder.VendorProduct);
             productOrder.OrderDate = DateTime.UtcNow;
             productOrder.Client = currentUser;
             productOrder.UnitPrice = productOrder.VendorProduct.Price;

@@ -54,7 +54,7 @@ namespace MoyoBusinessAdvisory.Controllers
                 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = vendorprod }, vendorprod);
+            return Ok();
         }
 
         [HttpPost]
@@ -85,7 +85,7 @@ namespace MoyoBusinessAdvisory.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = vendorprod }, vendorprod);
+            return Ok();
         }
 
         [HttpPut]
@@ -110,7 +110,7 @@ namespace MoyoBusinessAdvisory.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = prod }, prod);
+            return Ok();
         }
 
         [HttpPost]
@@ -180,19 +180,6 @@ namespace MoyoBusinessAdvisory.Controllers
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
         [HttpGet]
         [Route("get")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -213,34 +200,7 @@ namespace MoyoBusinessAdvisory.Controllers
             });
         }
 
-        //[HttpGet]
-        //[Route("get")]
-        //public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
-        //{
-        //    //https://stackoverflow.com/questions/67890726/ef-core-trying-to-insert-relational-data-that-already-exists
-        //    var prods = await _context.Products.ToListAsync();
-        //    var vendors = await _context.Vendors.ToListAsync(); // gets the reference to the object.
-        //    // https://stackoverflow.com/questions/28745798/how-should-i-return-two-lists-of-objects-from-one-controller-action
-        //    return Json(new
-        //    {
-        //        products = prods,
-        //        vendors = vendors
-        //    });
-        //}
-        //[HttpGet]
-        //[Route("get")]
-        //public async Task<ActionResult<IEnumerable<Product>>> GetVendorProducts()
-        //{
-        //    //https://stackoverflow.com/questions/67890726/ef-core-trying-to-insert-relational-data-that-already-exists
-        //    var prods = await _context.Products.ToListAsync();
-        //    var vendors = await _context.Vendors.ToListAsync(); // gets the reference to the object.
-        //    // https://stackoverflow.com/questions/28745798/how-should-i-return-two-lists-of-objects-from-one-controller-action
-        //    return Json(new
-        //    {
-        //        products = prods,
-        //        vendors = vendors
-        //    });
-        //}
+       
 
 
     }

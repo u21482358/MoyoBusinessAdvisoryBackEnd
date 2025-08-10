@@ -1,4 +1,6 @@
-﻿namespace MoyoBusinessAdvisory.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+namespace MoyoBusinessAdvisory.Models
 {
     public class Client : AppUser
     {
@@ -11,7 +13,7 @@
         public override List<ProductOrder> GetOrders(DataContext _context)
         {
 
-            return _context.Orders.Where(c => c.Client.Id == Id).ToList();
+            return _context.Orders.Where(c => c.Client.Id == Id).Include(c => c.VendorProduct.Product).ToList();
             Console.WriteLine("Drawing a generic shape.");
         }
     }

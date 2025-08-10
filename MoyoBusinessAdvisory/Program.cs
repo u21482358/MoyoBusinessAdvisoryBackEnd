@@ -92,6 +92,9 @@ builder.Services.AddControllersWithViews()
 // make sure builder stuff is before builder.Build()
 
 var app = builder.Build();
+
+
+//app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create)
 app.UseCors("AllowAllHeaders");
 
 

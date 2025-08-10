@@ -28,24 +28,7 @@ namespace MoyoBusinessAdvisory.Controllers
             _configuration = configuration;
             _claimsPrincipalFactory = claimsPrincipalFactory;
         }
-        // GET: OrderController
-        //    public ActionResult GetCustomerOrders()
-        //    {
-        //        return View();
-        //    }
-
-        //    // GET: OrderController/Details/5
-        //    // For Capturer
-        //    public ActionResult GetAllOrders(int id)
-        //    {
-        //        return View();
-        //    }
-
-        //    // GET: OrderController/Create
-        //    public ActionResult GetVendorOrders()
-        //    {
-        //        return View();
-        //    }
+      
 
         // POST: OrderController/Create
         [HttpPost]
@@ -64,8 +47,9 @@ namespace MoyoBusinessAdvisory.Controllers
             // var vendorProduct = _context.VendorProducts.Where(c => c.VendorId == productOrder.VendorProduct.Vendor.Id && c.ProductId == productOrder.VendorProduct.Product.Id).AsNoTracking().FirstOrDefault();
             _context.Attach(productOrder.VendorProduct);
             //_context.VendorProducts.Attach(productOrder.VendorProduct);
-            productOrder.OrderDate = DateTime.UtcNow;
+            productOrder.OrderDate = DateTime.Now;
             productOrder.Client = currentUser;
+            productOrder.OrderStatus = _context.OrderStatuses.Find(1);
             productOrder.UnitPrice = productOrder.VendorProduct.Price;
             _context.Orders.Add(productOrder);
             await _context.SaveChangesAsync();
@@ -88,46 +72,22 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok(orders);
         }
 
-        //    // GET: OrderController/Edit/5
-        //    public ActionResult Edit(int id)
-        //    {
-        //        return View();
-        //    }
+        [HttpPut]
+        [Route("put")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        //    // POST: OrderController/Edit/5
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public ActionResult Edit(int id, IFormCollection collection)
-        //    {
-        //        try
-        //        {
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }
+        public async Task<ActionResult> UpdateProductOrderStatus(ProductOrder productOrder)
+        {
+           var Order = _context.Orders.Find(productOrder.Id);
+            Order.OrderStatus = _context.OrderStatuses.Find(productOrder.OrderStatus.Id);
+            _context.Orders.Update(Order);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
-        //    // GET: OrderController/Delete/5
-        //    public ActionResult Delete(int id)
-        //    {
-        //        return View();
-        //    }
 
-        //    // POST: OrderController/Delete/5
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public ActionResult Delete(int id, IFormCollection collection)
-        //    {
-        //        try
-        //        {
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch
-        //        {
-        //            return View();
-        //        }
-        //    }
+
+
+
     }
 }

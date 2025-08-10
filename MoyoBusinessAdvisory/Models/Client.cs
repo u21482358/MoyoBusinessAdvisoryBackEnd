@@ -13,7 +13,7 @@ namespace MoyoBusinessAdvisory.Models
         public override List<ProductOrder> GetOrders(DataContext _context)
         {
 
-            return _context.Orders.Where(c => c.Client.Id == Id).Include(c => c.VendorProduct.Product).ToList();
+            return _context.Orders.Where(c => c.Client.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.OrderStatus).ToList(); ;
             Console.WriteLine("Drawing a generic shape.");
         }
     }

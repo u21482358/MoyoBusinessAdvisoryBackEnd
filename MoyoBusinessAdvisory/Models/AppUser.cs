@@ -70,7 +70,7 @@ namespace MoyoBusinessAdvisory.Models
 
         public virtual List<ProductOrder> GetOrders( DataContext _context)
         {
-            return _context.Orders.Include(c => c.VendorProduct.Product).Include(c => c.VendorProduct.Vendor).Include(c => c.Client).ToList();
+            return _context.Orders.Include(c => c.VendorProduct.Product).Include(c => c.VendorProduct.Vendor).Include(c => c.Client).Include(c => c.OrderStatus).ToList();
         }
 
         public virtual void GetProducts(DataContext _context,out object products)

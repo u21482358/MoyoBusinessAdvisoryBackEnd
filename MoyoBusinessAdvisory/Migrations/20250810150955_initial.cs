@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace MoyoBusinessAdvisory.Migrations
 {
     /// <inheritdoc />
@@ -51,6 +53,19 @@ namespace MoyoBusinessAdvisory.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderStatuses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,6 +257,7 @@ namespace MoyoBusinessAdvisory.Migrations
                     VendorProductVendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VendorProductProductId = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    OrderStatusId = table.Column<int>(type: "int", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NumberOfItems = table.Column<double>(type: "float", nullable: false),
                     UnitPrice = table.Column<double>(type: "float", nullable: true)
@@ -255,11 +271,35 @@ namespace MoyoBusinessAdvisory.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Orders_OrderStatuses_OrderStatusId",
+                        column: x => x.OrderStatusId,
+                        principalTable: "OrderStatuses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Orders_VendorProducts_VendorProductVendorId_VendorProductProductId",
                         columns: x => new { x.VendorProductVendorId, x.VendorProductProductId },
                         principalTable: "VendorProducts",
                         principalColumns: new[] { "VendorId", "ProductId" },
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "1", null, "capturer", "CAPTURER" },
+                    { "2", null, "vendor", "VENDOR" },
+                    { "3", null, "client", "CLIENT" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "OrderStatuses",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Pending" },
+                    { 2, "Delivered" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -307,6 +347,11 @@ namespace MoyoBusinessAdvisory.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderStatusId",
+                table: "Orders",
+                column: "OrderStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_VendorProductVendorId_VendorProductProductId",
                 table: "Orders",
                 columns: new[] { "VendorProductVendorId", "VendorProductProductId" });
@@ -348,6 +393,9 @@ namespace MoyoBusinessAdvisory.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "OrderStatuses");
 
             migrationBuilder.DropTable(
                 name: "VendorProducts");

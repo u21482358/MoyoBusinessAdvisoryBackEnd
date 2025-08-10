@@ -9,7 +9,7 @@
 
         public Client? Client { get; set; }
 
-       // public OrderStatus OrderStaus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
 
         public DateTime? OrderDate { get; set; }
 

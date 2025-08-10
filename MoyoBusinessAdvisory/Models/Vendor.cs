@@ -16,8 +16,8 @@ namespace MoyoBusinessAdvisory.Models
 
         public override List<ProductOrder> GetOrders(DataContext _context)
         {
-           return _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.Client).ToList();
-          //  Console.WriteLine("Drawing a generic shape.");
+           return _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.Client).Include(c => c.OrderStatus).ToList();
+            //  Console.WriteLine("Drawing a generic shape.");
         }
 
         public override void GetProducts(DataContext _context,out object products)

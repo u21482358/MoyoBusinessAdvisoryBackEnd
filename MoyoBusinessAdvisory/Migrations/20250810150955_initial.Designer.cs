@@ -12,7 +12,7 @@ using MoyoBusinessAdvisory.Models;
 namespace MoyoBusinessAdvisory.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250807065113_initial")]
+    [Migration("20250810150955_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -50,6 +50,26 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "capturer",
+                            NormalizedName = "CAPTURER"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "vendor",
+                            NormalizedName = "VENDOR"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "client",
+                            NormalizedName = "CLIENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -240,6 +260,35 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.OrderStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Delivered"
+                        });
+                });
+
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -274,6 +323,9 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("OrderStatusId")
+                        .HasColumnType("int");
+
                     b.Property<double?>("UnitPrice")
                         .HasColumnType("float");
 
@@ -287,6 +339,8 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("OrderStatusId");
 
                     b.HasIndex("VendorProductVendorId", "VendorProductProductId");
 
@@ -432,6 +486,10 @@ namespace MoyoBusinessAdvisory.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("ClientId");
 
+                    b.HasOne("MoyoBusinessAdvisory.Models.OrderStatus", "OrderStatus")
+                        .WithMany("Orders")
+                        .HasForeignKey("OrderStatusId");
+
                     b.HasOne("MoyoBusinessAdvisory.Models.VendorProduct", "VendorProduct")
                         .WithMany("Orders")
                         .HasForeignKey("VendorProductVendorId", "VendorProductProductId")
@@ -439,6 +497,8 @@ namespace MoyoBusinessAdvisory.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+
+                    b.Navigation("OrderStatus");
 
                     b.Navigation("VendorProduct");
                 });
@@ -471,6 +531,11 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("MoyoBusinessAdvisory.Models.OrderStatus", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>

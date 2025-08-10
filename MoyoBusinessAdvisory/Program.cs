@@ -9,6 +9,7 @@ using MoyoBusinessAdvisory.Models;
 using Newtonsoft.Json.Serialization;
 using System.Security.Policy;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 //using Microsoft.AspNetCore.Mvc.New
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,35 +60,49 @@ builder.Services.AddMvc()
                 {
                     opt.JsonSerializerOptions.ReferenceHandler = null;
                 });
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+}
+else
+{
+    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    //connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
+}
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(connection);
 });
 
-builder.Services.AddAuthentication()
-                .AddCookie()
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidIssuer = builder.Configuration["Tokens:Issuer"],
-                        ValidAudience = builder.Configuration["Tokens:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
-                    };
-                }).AddGoogle(options =>
-                {
 
-          
-                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]; ;
-                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]; ;
-                }); ;
+builder.Services.AddAuthentication()
+                    .AddCookie()
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters()
+                        {
+                            ValidIssuer = builder.Configuration["Tokens:Issuer"],
+                            ValidAudience = builder.Configuration["Tokens:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
+                        };
+                    }).AddGoogle(options =>
+                    {
+
+
+                        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]; ;
+                        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]; ;
+                    }); ;
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+
+
 
 // make sure builder stuff is before builder.Build()
 
@@ -109,6 +124,7 @@ app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

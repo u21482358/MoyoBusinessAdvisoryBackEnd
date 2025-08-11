@@ -51,7 +51,7 @@ namespace MoyoBusinessAdvisory.Controllers
             productOrder.Client = currentUser;
             productOrder.OrderStatus = _context.OrderStatuses.Find(1);
             productOrder.UnitPrice = productOrder.VendorProduct.Price;
-            _context.Orders.Add(productOrder);
+            await _context.Orders.AddAsync(productOrder);
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -65,7 +65,7 @@ namespace MoyoBusinessAdvisory.Controllers
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
           AppUser currentUser = await _userManager.FindByIdAsync(userId);
             object products;
-           var orders = currentUser.GetOrders(_context);
+           var orders = await currentUser.GetOrders(_context);
 
 
             // you can call an override method on a specific type.
@@ -78,8 +78,8 @@ namespace MoyoBusinessAdvisory.Controllers
 
         public async Task<ActionResult> UpdateProductOrderStatus(ProductOrder productOrder)
         {
-           var Order = _context.Orders.Find(productOrder.Id);
-            Order.OrderStatus = _context.OrderStatuses.Find(productOrder.OrderStatus.Id);
+           var Order = await _context.Orders.FindAsync(productOrder.Id);
+            Order.OrderStatus = await _context.OrderStatuses.FindAsync(productOrder.OrderStatus.Id);
             _context.Orders.Update(Order);
             await _context.SaveChangesAsync();
             return Ok();

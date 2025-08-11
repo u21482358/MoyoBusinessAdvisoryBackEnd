@@ -57,10 +57,11 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok();
         }
 
+        // Synchronous
         [HttpPost]
         [Route("assignProductToVendor")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Product>> AssignProductToVendor(VendorProduct vendorprod)
+        public IActionResult AssignProductToVendor(VendorProduct vendorprod)
         {
 
             // cannot insert duplicate key in object asp net microsoft entity framework core.
@@ -83,15 +84,18 @@ namespace MoyoBusinessAdvisory.Controllers
             var product = _context.VendorProducts.Add(vendorprod);
 
 
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
 
             return Ok();
         }
 
+
+
+        // A synchronous method.
         [HttpPut]
         [Route("put")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Product>> PutProduct(VendorProductViewModel prod)
+        public IActionResult PutProduct(VendorProductViewModel prod)
         {
             // cannot insert duplicate key in object asp net microsoft entity framework core.
             // https://stackoverflow.com/questions/29272581/why-ef-navigation-property-return-null
@@ -108,41 +112,11 @@ namespace MoyoBusinessAdvisory.Controllers
             var product = _context.VendorProducts.Update(vendorProduct);
 
 
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
 
             return Ok();
         }
 
-        [HttpPost]
-        [Route("post2")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult> PostProductViaVendorICollection([FromBody] Product prod)
-        {
-            // cannot insert duplicate key in object asp net microsoft entity framework core.
-            // https://stackoverflow.com/questions/29272581/why-ef-navigation-property-return-null
-            // attaches to make sure that stage is unchanged...
-            //prod.
-            //https://stackoverflow.com/questions/75600798/inserting-a-dependent-entity-while-inserting-the-principal-entity-with-entity-fr
-            // prod.Vendor = prod.Vendor;
-            //var vendor = _context.Vendors.Where(p => p == prod.Vendor).FirstOrDefault();
-            //var products = _context.Vendors.prd
-          //  var prods = await _context.Vendors.Include(vendor => vendor.Products).ToListAsync();
-
-
-
-            //if (vendor == null)
-            //{
-            //    return NotFound("Vendor not found");
-            //}
-            //else
-            //{
-
-            //    _context.Products.Add(prod);
-            //    vendor.Products.Add(prod);
-            //    await _context.SaveChangesAsync();
-            //    //vendor.\
-            return Ok();
-        }
 
         [HttpPost]
         [Route("UnassignedVendors")]
@@ -169,7 +143,7 @@ namespace MoyoBusinessAdvisory.Controllers
         [HttpPost]
         [Route("GetVendorsOfferingProduct")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult> GetVendorsOfferingproduct([FromBody] Product prod)
+        public IActionResult GetVendorsOfferingproduct([FromBody] Product prod)
         {
             // excluding product from select.
             var vendorProducts = _context.VendorProducts.Where(c => c.Product == prod && c.QuantityOnHand > 0).Select(c => new VendorProduct { Vendor = c.Vendor, Price = c.Price, QuantityOnHand = c.QuantityOnHand }).OrderBy(c => c.Price).ToList();
@@ -183,15 +157,19 @@ namespace MoyoBusinessAdvisory.Controllers
         [HttpGet]
         [Route("get")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts() {
+        public IActionResult GetProducts() {
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            AppUser currentUser = await _userManager.FindByIdAsync(userId);
+
+            // https://stackoverflow.com/questions/22628087/calling-async-method-synchronously
+            AppUser currentUser = Task.Run(() => _userManager.FindByIdAsync(userId)).GetAwaiter().GetResult();
+            
+              
             object products;
            currentUser.GetProducts(_context,out products);
             //https://stackoverflow.com/questions/67890726/ef-core-trying-to-insert-relational-data-that-already-exists
           
-         var vendors = await _context.Vendors.ToListAsync(); // gets the reference to the object.
+         var vendors =  _context.Vendors.ToList(); // gets the reference to the object.
             // https://stackoverflow.com/questions/28745798/how-should-i-return-two-lists-of-objects-from-one-controller-action
             return Json(new
             {

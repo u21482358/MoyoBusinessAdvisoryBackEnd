@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+
 namespace MoyoBusinessAdvisory.Models
 {
     //https://medium.com/@leroyleowdev/understanding-one-to-many-relationships-in-ef-core-with-examples-adb8db6eaa7c
@@ -20,7 +21,7 @@ namespace MoyoBusinessAdvisory.Models
 
         //public string UserName { get; set; }
 
-        public string Password { get; set; } // only a password hash
+        public string? Password { get; set; } // only a password hash
 
         
         public async Task<IdentityResult?> AddUser(UserManager<AppUser> _userManager, DataContext _context, RoleManager<IdentityRole> _roleManager,string role) // calling it on an object
@@ -68,9 +69,9 @@ namespace MoyoBusinessAdvisory.Models
             return IdentityResult.Success;
         }
 
-        public virtual List<ProductOrder> GetOrders( DataContext _context)
+        public virtual async Task<List<ProductOrder>> GetOrders( DataContext _context)
         {
-            return _context.Orders.Include(c => c.VendorProduct.Product).Include(c => c.VendorProduct.Vendor).Include(c => c.Client).Include(c => c.OrderStatus).ToList();
+            return await _context.Orders.Include(c => c.VendorProduct.Product).Include(c => c.VendorProduct.Vendor).Include(c => c.Client).Include(c => c.OrderStatus).ToListAsync();
         }
 
         public virtual void GetProducts(DataContext _context,out object products)

@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MoyoBusinessAdvisory.Models;
+using MoyoBusinessAdvisory;
 
 #nullable disable
 
 namespace MoyoBusinessAdvisory.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250810150955_initial")]
+    [Migration("20250811085055_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1",
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             Name = "capturer",
                             NormalizedName = "CAPTURER"
                         },
@@ -221,7 +221,6 @@ namespace MoyoBusinessAdvisory.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
@@ -347,53 +346,6 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserRoleId");
-
-                    b.ToTable("User");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserRoles");
-                });
-
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
                     b.Property<string>("VendorId")
@@ -503,17 +455,6 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Navigation("VendorProduct");
                 });
 
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.User", b =>
-                {
-                    b.HasOne("MoyoBusinessAdvisory.Models.UserRole", "UserRole")
-                        .WithMany("Users")
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRole");
-                });
-
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>
                 {
                     b.HasOne("MoyoBusinessAdvisory.Models.Product", "Product")
@@ -541,11 +482,6 @@ namespace MoyoBusinessAdvisory.Migrations
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.Product", b =>
                 {
                     b.Navigation("VendorProducts");
-                });
-
-            modelBuilder.Entity("MoyoBusinessAdvisory.Models.UserRole", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("MoyoBusinessAdvisory.Models.VendorProduct", b =>

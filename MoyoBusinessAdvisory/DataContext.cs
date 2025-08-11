@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNetCore.Identity;
+using MoyoBusinessAdvisory.Models;
+
 
 // https://stackoverflow.com/questions/77565815/entityframeworkcore-add-migration-the-module-entityframeworkcore-could-not-b
 
 
 // https://www.c-sharpcorner.com/UploadFile/abhikumarvatsa/code-first-approach-in-entity-framework/
-namespace MoyoBusinessAdvisory.Models
+namespace MoyoBusinessAdvisory
 {
     // When running enable migration ... https://stackoverflow.com/questions/19475998/no-context-type-found-in-the-assembly-asp-net-mvc4
     public class DataContext : IdentityDbContext<AppUser>
@@ -29,9 +31,7 @@ namespace MoyoBusinessAdvisory.Models
 
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<AppUser> Users { get; set; }
-        // public DbSet<Orderline> Orderlines { get; set; }
-
-        public DbSet<UserRole> UserRoles { get; set; }
+       
 
         public DbSet<VendorProduct> VendorProducts { get; set; }
 
@@ -43,20 +43,23 @@ namespace MoyoBusinessAdvisory.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-
+            const string CAPTURER_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
+            const string ROLE_ID = "ad376a8f-9eab-4bb9-9fca-30b01540f445";
             // List<OrderStatus> orderStatuses;
             // orderStatuses.Add(O)
-           // { new OrderStatus { Id = 1, Name = "Pending" }, new OrderStatus { Id = 2, Name = "Delivered" } };
+            // { new OrderStatus { Id = 1, Name = "Pending" }, new OrderStatus { Id = 2, Name = "Delivered" } };
             modelBuilder.Entity<OrderStatus>().HasData(
                new OrderStatus { Id = 1, Name = "Pending" },
                new OrderStatus { Id = 2, Name = "Delivered" }
 );
             // https://stackoverflow.com/questions/78302899/how-do-i-seed-the-creation-of-one-or-more-users-in-onmodelcreating-with-migrat
-          
-                  modelBuilder.Entity<IdentityRole>().HasData(
+
+            // https://stackoverflow.com/questions/59342128/how-can-i-add-admin-user-using-onmodelcreating-in-asp-net-identity
+            
+            modelBuilder.Entity<IdentityRole>().HasData(
                           new IdentityRole
                           {
-                              Id = "1",
+                              Id = CAPTURER_ID,
                               Name = "capturer",
                               NormalizedName = "CAPTURER"
                           },
@@ -73,6 +76,48 @@ namespace MoyoBusinessAdvisory.Models
                               NormalizedName = "CLIENT"
                           }
                       );
+            // https://stackoverflow.com/questions/59342128/how-can-i-add-admin-user-using-onmodelcreating-in-asp-net-identity
+
+
+
+
+           
+
+           
+
+            //seed admin role
+
+
+            //create user
+            //var appUser = new AppUser
+            //{
+            //    Id = CAPTURER_ID,
+            //    UserName = "Mike",
+            //    Name = "Mike",
+            //    NormalizedUserName = "Mike",
+            //    Email = "ma.gaitsmith@gmail.com",
+            //    NormalizedEmail = "ma.gaitsmith@gmail.com",
+            //    EmailConfirmed = false,
+            //    SecurityStamp = string.Empty
+            //};
+
+            ////set user password
+            //PasswordHasher<AppUser> ph = new PasswordHasher<AppUser>();
+            //appUser.PasswordHash = ph.HashPassword(appUser, "123456");
+
+            ////seed user
+            //modelBuilder.Entity<AppUser>().HasData(appUser);
+
+            ////set user role to admin
+            //modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            //{
+            //    RoleId = ROLE_ID,
+            //    UserId = CAPTURER_ID
+            //});
+        
+
+
+
             base.OnModelCreating(modelBuilder);
             //modelBuilder.Entity<ServiceCompany>().ToTable("ServiceCompanies");
 

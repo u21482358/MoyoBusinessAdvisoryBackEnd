@@ -33,7 +33,7 @@ namespace MoyoBusinessAdvisory.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -79,19 +79,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserRoles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,28 +214,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserRoleId = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_UserRoles_UserRoleId",
-                        column: x => x.UserRoleId,
-                        principalTable: "UserRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -288,9 +253,9 @@ namespace MoyoBusinessAdvisory.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1", null, "capturer", "CAPTURER" },
                     { "2", null, "vendor", "VENDOR" },
-                    { "3", null, "client", "CLIENT" }
+                    { "3", null, "client", "CLIENT" },
+                    { "a18be9c0-aa65-4af8-bd17-00bd9344e575", null, "capturer", "CAPTURER" }
                 });
 
             migrationBuilder.InsertData(
@@ -357,11 +322,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 columns: new[] { "VendorProductVendorId", "VendorProductProductId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_UserRoleId",
-                table: "User",
-                column: "UserRoleId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_VendorProducts_ProductId",
                 table: "VendorProducts",
                 column: "ProductId");
@@ -389,9 +349,6 @@ namespace MoyoBusinessAdvisory.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -399,9 +356,6 @@ namespace MoyoBusinessAdvisory.Migrations
 
             migrationBuilder.DropTable(
                 name: "VendorProducts");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

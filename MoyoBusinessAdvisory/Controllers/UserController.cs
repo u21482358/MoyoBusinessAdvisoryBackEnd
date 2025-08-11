@@ -76,33 +76,7 @@ namespace MoyoBusinessAdvisory.Controllers
             return Ok(new { role = role });
         }
 
-        //[HttpGet]
-        //[Route("getVendorProducts")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //public async Task<ActionResult<Product>> GetVendorProducts()
-        //{
-        //    string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //    AppUser currentUser = await _userManager.FindByIdAsync(userId);
-
-        //    // https://stackoverflow.com/questions/25076702/cast-object-type-in-a-linq-statement
-        //    Vendor vendor = _context.Users.Where(v => v.Id == userId).Select(v =>v).OfType<Vendor>().Include(v => v.Products).FirstOrDefault();
-            
-
-
-        //    if (vendor == null)
-        //    {
-        //        return NotFound("Vendor not found");
-        //    }
-        //    else
-        //    {
-
-        //        //_context.Products.Add(prod);
-        //        //vendor.Products.Add(prod);
-        //        await _context.SaveChangesAsync();
-        //        //vendor.
-        //    }
-        //    return Ok(vendor);
-        //}
+       
 
         [HttpPost]
         [Route("postVendor")]
@@ -271,61 +245,36 @@ namespace MoyoBusinessAdvisory.Controllers
             return vendors;
         }
 
-        // POST: UserController/Create
-    //    [HttpPost]
-    //    [ValidateAntiForgeryToken]
-    //    public ActionResult Create(IFormCollection collection)
-    //    {
-    //        try
-    //        {
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //        catch
-    //        {
-    //            return View();
-    //        }
-    //    }
+        [HttpGet]
+        [Route("CreateCapturerManually")]
+        public async Task<ActionResult<IEnumerable<AppUser>>> CreateCapturerManually()
+        {
+            var appUser = new AppUser
+            {
+                
+                UserName = "ma.gaitsmith@gmail.com",
+                Name = "Mike",
+                Email = "ma.gaitsmith@gmail.com",
+                Password = "123456"
+            };
 
-    //    // GET: UserController/Edit/5
-    //    public ActionResult Edit(int id)
-    //    {
-    //        return View();
-    //    }
+            var result = await appUser.AddUser(_userManager, _context, _roleManager, "capturer");
+            // returning children of AppUser?
 
-    //    // POST: UserController/Edit/5
-    //    [HttpPost]
-    //    [ValidateAntiForgeryToken]
-    //    public ActionResult Edit(int id, IFormCollection collection)
-    //    {
-    //        try
-    //        {
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //        catch
-    //        {
-    //            return View();
-    //        }
-    //    }
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
 
-    //    // GET: UserController/Delete/5
-    //    public ActionResult Delete(int id)
-    //    {
-    //        return View();
-    //    }
+            return Ok(result);
 
-    //    // POST: UserController/Delete/5
-    //    [HttpPost]
-    //    [ValidateAntiForgeryToken]
-    //    public ActionResult Delete(int id, IFormCollection collection)
-    //    {
-    //        try
-    //        {
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //        catch
-    //        {
-    //            return View();
-    //        }
-    //    }
+            // NB FIX THE RETURNING OF PASSWORD
+            var vendors = await _context.Users.Where(x => x is Vendor).ToArrayAsync();
+            //var users = await _context.Users.ToListAsync();
+            //Vendor[] vendors = await _context.Users.OfType<Vendor>().ToArrayAsync();
+            return vendors;
+        }
+
+
     }
 }

@@ -9,6 +9,7 @@ using MoyoBusinessAdvisory.Models;
 using Newtonsoft.Json.Serialization;
 using System.Security.Policy;
 using System.Text;
+using Microsoft.ApplicationInsights;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 //using Microsoft.AspNetCore.Mvc.New
 
@@ -63,15 +64,18 @@ builder.Services.AddMvc()
 var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
 {
-    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
     //connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+    connection = builder.Configuration.GetConnectionString("DefaultConnection");
+    
 }
 else
 {
     connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-    //connection = builder.Configuration.GetConnectionString("DefaultConnection");
+    
 
 }
+
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
 builder.Services.AddDbContext<DataContext>(options =>
 {

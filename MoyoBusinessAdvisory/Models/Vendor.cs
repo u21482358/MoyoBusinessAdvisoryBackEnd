@@ -14,9 +14,9 @@ namespace MoyoBusinessAdvisory.Models
 
         
 
-        public override List<ProductOrder> GetOrders(DataContext _context)
+        public override async Task<List<ProductOrder>> GetOrders(DataContext _context)
         {
-           return _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.Client).Include(c => c.OrderStatus).ToList();
+           return await _context.Orders.Where(c => c.VendorProduct.Vendor.Id == Id).Include(c => c.VendorProduct.Product).Include(c => c.Client).Include(c => c.OrderStatus).ToListAsync();
             //  Console.WriteLine("Drawing a generic shape.");
         }
 

@@ -134,8 +134,7 @@ namespace MoyoBusinessAdvisory.Controllers
                 return BadRequest();
                 //log an exception
 
-                var user = await _userManager.FindByEmailAsync(payload.Email);
-                return GenerateJWTToken(user);
+              
 
 
             }

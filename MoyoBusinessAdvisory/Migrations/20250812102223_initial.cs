@@ -224,7 +224,7 @@ namespace MoyoBusinessAdvisory.Migrations
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     OrderStatusId = table.Column<int>(type: "int", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumberOfItems = table.Column<double>(type: "float", nullable: false),
+                    NumberOfItems = table.Column<int>(type: "int", nullable: false),
                     UnitPrice = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>

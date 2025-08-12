@@ -12,7 +12,7 @@ using MoyoBusinessAdvisory;
 namespace MoyoBusinessAdvisory.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250811085055_initial")]
+    [Migration("20250812102223_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -316,8 +316,8 @@ namespace MoyoBusinessAdvisory.Migrations
                     b.Property<string>("ClientId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<double>("NumberOfItems")
-                        .HasColumnType("float");
+                    b.Property<int>("NumberOfItems")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");

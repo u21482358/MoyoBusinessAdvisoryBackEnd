@@ -13,7 +13,7 @@
 
         public DateTime? OrderDate { get; set; }
 
-        public double NumberOfItems { get; set; } // THIS IS BECAUSE PRICES CAN CHANGE IN THE FUTURE.
+        public int NumberOfItems { get; set; } // THIS IS BECAUSE PRICES CAN CHANGE IN THE FUTURE.
 
         public double? UnitPrice { get; set; }
     }

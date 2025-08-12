@@ -37,22 +37,34 @@ namespace MoyoBusinessAdvisory.Controllers
         
         public async Task<ActionResult> PlaceOrder(ProductOrder productOrder)
         {
+            // https://stackoverflow.com/questions/54080975/update-newly-inserted-records-id-to-another-table-using-entity-framework
+            using (var dbcxtransaction = _context.Database.BeginTransaction())
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Client currentUser = (Client)await _userManager.FindByIdAsync(userId);
+                // then assign that user to the order.\
 
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Client currentUser = (Client)await _userManager.FindByIdAsync(userId);
-            // then assign that user to the order.\
-            productOrder.VendorProduct.ProductId = productOrder.VendorProduct.Product.Id;
-            productOrder.VendorProduct.VendorId = productOrder.VendorProduct.Vendor.Id;
-            var productId = productOrder.VendorProduct.ProductId;
-            // var vendorProduct = _context.VendorProducts.Where(c => c.VendorId == productOrder.VendorProduct.Vendor.Id && c.ProductId == productOrder.VendorProduct.Product.Id).AsNoTracking().FirstOrDefault();
-            _context.Attach(productOrder.VendorProduct);
-            //_context.VendorProducts.Attach(productOrder.VendorProduct);
-            productOrder.OrderDate = DateTime.Now;
-            productOrder.Client = currentUser;
-            productOrder.OrderStatus = _context.OrderStatuses.Find(1);
-            productOrder.UnitPrice = productOrder.VendorProduct.Price;
-            await _context.Orders.AddAsync(productOrder);
-            await _context.SaveChangesAsync();
+                var selectedProd = productOrder.VendorProduct;
+                //vendorProd.
+                var vendorProduct = _context.VendorProducts.Find(selectedProd.VendorId, selectedProd.ProductId);
+                vendorProduct.QuantityOnHand = vendorProduct.QuantityOnHand - productOrder.NumberOfItems;
+
+                _context.Update(vendorProduct);
+                await _context.SaveChangesAsync();
+                _context.Entry(vendorProduct).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+               // _context.ChangeTracker.Clear();
+                productOrder.VendorProduct = vendorProduct;
+                _context.VendorProducts.Attach(vendorProduct);
+                productOrder.OrderDate = DateTime.Now;
+                productOrder.Client = currentUser;
+                productOrder.OrderStatus = _context.OrderStatuses.Find(1);
+                productOrder.UnitPrice = productOrder.VendorProduct.Price;
+                await _context.Orders.AddAsync(productOrder);
+                //var vendor _context.VendorProducts.Where(c => c.ProductId == productOrder.VendorProduct.ProductId && c.VendorId == productOrder.VendorProduct.VendorId).FirstOrDefault();
+
+                await _context.SaveChangesAsync();
+                dbcxtransaction.Commit();
+            }
             return Ok();
         }
 
